@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Container, Modal, ModalBody, ModalHeader, ModalFooter, FormGroup } from 'reactstrap';
 //import { Badge } from 'react-bootstrap';
+import TagsInput from 'react-tagsinput'
+import 'react-tagsinput/react-tagsinput.css'
+
 import { db } from "../firebase/firebase-config";
 import soccerShoe from '../assets/icons/soccer-shoe-467.png';
 import YoutubeEmbed from './YoutubeEmbed';
@@ -9,7 +12,7 @@ import { Badge } from 'react-bootstrap';
 
 function TrainingsComponent() {
 
-
+    // COMIENZO DE DECLARACIONES INICIALES PARA OBTENER DATOS DE LA BD
 
     const [ players,setPlayers ] = useState([]);
 
@@ -27,16 +30,14 @@ function TrainingsComponent() {
                 entrena: false,
             }
 
-            //console.log(loadPlayer);
             setPlayers(players => [...players, loadPlayer]);
             
         })
-
     }
 
     useEffect(() => {
         fetchPlayers();
-    }, [ ])
+    }, [])
 
     const [ trainings,setTrainings ] = useState([]);
 
@@ -56,31 +57,26 @@ function TrainingsComponent() {
                 videos: doc.data().videos,
             }
 
-            //console.log(loadTraining);
             setTrainings(trainings => [...trainings, loadTraining]);
             
         })
-
     }
 
-    const handleNewTraining = async () => {
-        try {
-            await db.collection("trainings").add(state.form);
-        } catch (error) {
-            console.log(error)
-        }
-        setTrainings([]);
-        fetchTrainings();
-        fetchPlayers();
-        setState({modalInsertar: false});
-
-    }
-
+    
     useEffect(() => {
         fetchTrainings();
     }, [ ])
 
+    // DECLARACIÓN INICIAL DE LOS STATES
+
     const initialState = {
+        modalInsertar: false,
+        modalEditar: false,
+    }
+
+    const [state, setState] = useState(initialState);
+
+    const initialFormState = {
         data: trainings,
         form: {
             id: '',
@@ -89,31 +85,28 @@ function TrainingsComponent() {
             asistentes: [''],
             videos: ['ninguno'],
         },
-        modalInsertar: false,
-        modalEditar: false,
     };
 
-    const [state, setState] = useState(initialState);
+    const [formState, setFormState] = useState(initialFormState);
 
-    const handleChangeAdd = (e) => {
-        setState({
-            form:{
-                ...state.form,
-                [e.target.name]: e.target.value,
-            },
-            modalInsertar: true,
-        })
+    /// FIN DE DECLARACIONES DE ARRAYS PARA OPTIONS
+
+    const [videosState, setVideosState] = useState({videos: []});
+
+    const handleChangeVideos = (videos) => {
+        setVideosState({videos})
     }
 
-    const handleChangeEdit = (e) => {
-        setState({
+    useEffect(() => {
+        setFormState({
             form:{
-                ...state.form,
-                [e.target.name]: e.target.value,
+                ...formState.form,
+                videos: videosState.videos,
             },
-            modalEditar: true,
         })
-    }
+    }, [videosState])
+
+    // DECLARACIÓN DEL MODAL
 
     const mostrarModalInsertar = () => {
         setState({modalInsertar: true})
@@ -123,24 +116,61 @@ function TrainingsComponent() {
         setState({modalInsertar: false})
     }
 
-    const [videosAdd, setVideosAdd] = useState([])
-
     const mostrarModalEditar = ( registro, indice ) => {
-        setState({modalEditar: true, form: registro});
+        setState({modalEditar: true});
+        setFormState({form: registro});
         setPlayers(registro.asistentes);
-        setVideosAdd(trainings[indice].videos)
     }
 
     const ocultarModalEditar = () => {
         setState({modalEditar: false})
     }
 
-    const handleEditTraining = async (data) => {
+    // COMIENZO DE FUNCIONES PARA AGREGAR
+
+    const handleNewTraining = async () => {
         try {
-            await db.collection("trainings").doc(data.id).update(state.form);
+            await db.collection("trainings").add(formState.form);
         } catch (error) {
             console.log(error)
         }
+        setTrainings([]);
+        fetchTrainings();
+        fetchPlayers();
+        setState({modalInsertar: false});
+    }
+    
+    const handleChangeAdd = (e) => {
+        setFormState({
+            form:{
+                ...formState.form,
+                [e.target.name]: e.target.value,
+            },
+        })
+        setState({modalInsertar: true});
+    }
+
+    // COMIENZO DE FUNCIONES PARA EDITAR
+
+    const handleChangeEdit = (e) => {
+        setFormState({
+            form:{
+                ...formState.form,
+                [e.target.name]: e.target.value,
+            },
+        })
+        setState({modalEditar: true})
+    }
+
+    const handleEditTraining = async (data) => {
+        try {
+            await db.collection("trainings").doc(data.id).update(formState.form);
+        } catch (error) {
+            console.log(error)
+        }
+
+        setTrainings([]);
+        fetchTrainings();
         
         setState({modalEditar: false});
     }
@@ -155,15 +185,13 @@ function TrainingsComponent() {
 
         setPlayers(playersAsisten);
 
-        setState({
+        setFormState({
             form:{
-                ...state.form,
+                ...formState.form,
                 asistentes: players,
             },
-            modalInsertar: true,
         })
-
-        console.log(players)
+        setState({modalInsertar: true})
     }
 
     const handleBadgeChangeEdit = ( index ) => {
@@ -176,15 +204,13 @@ function TrainingsComponent() {
 
         setPlayers(playersAsisten);
 
-        setState({
+        setFormState({
             form:{
-                ...state.form,
+                ...formState.form,
                 asistentes: players,
             },
-            modalEditar: true,
         })
-
-        //console.log(players)
+        setState({modalEditar: true})
     }
 
     const handleDeleteTraining = async ( id ) => {
@@ -195,48 +221,6 @@ function TrainingsComponent() {
             console.log(error)
         }
     }
-
-    const [videos, setVideos] = useState([]);
-
-    const [vtext, setVtext] = useState("");
-
-    const handleAddingVideo = (e) => {
-        setVtext(e.target.value);
-        console.log(vtext);
-    }
-
-    const handleAddVideo = (e) => {
-
-        console.log("vtext", vtext);
-
-        console.log("Videos antes", videos)
-
-        setVideos( videos => [...videos, vtext] );
-
-        console.log("Videos antes", videos)
-
-        // console.log("State:", state.form.videos);
-
-        console.log("Videos despues", videos);
-    }
-
-    useEffect(() => {
-        let estado = false;
-        if (videos.length > 0) {
-            estado = true
-        } else {
-            estado = false;
-        }
-        // Utilizo la variable estado para saber si está insertando ya que al usar el setState se borra el estado del modalInsertar
-        
-        setState({
-            form:{
-                ...state.form,
-                videos: videos,
-            },
-            modalInsertar: estado,
-        })
-    }, [videos])
 
     return (
         <>
@@ -285,7 +269,7 @@ function TrainingsComponent() {
                             players.map(( player, index ) => <div className="d-inline-block ms-1 mt-1" key={player.id}><Button color={ player.entrena ? "success": "secondary"} size="sm" onClick={ () => handleBadgeChange(index) }>{ player.apodo }</Button></div> )
                     }
 
-                    <FormGroup>
+                    {/* <FormGroup>
                         <label>Vídeos:</label>                       
                         <input className="form-control" name="video" type="text" onChange={ handleAddingVideo } />
                         <Button color="primary" onClick={ handleAddVideo }>Añadir vídeo</Button>
@@ -293,7 +277,18 @@ function TrainingsComponent() {
 
                     {
                             videos.map(( video ) => <div className="d-inline-block ms-1 mt-1" key={video}><Badge bg="secondary">{video}</Badge></div> )
-                    }
+                    } */}
+
+                    <FormGroup>
+                        <label>Vídeos:</label>
+                        <TagsInput
+                            value={videosState.videos}
+                            onChange={ handleChangeVideos }
+                            inputValue={videosState.videos}
+                            placeholder="Vídeos..."
+                            // onChangeInput={::this.handleChangeInput}
+                        />
+                    </FormGroup>
 
                 </ModalBody>
 
@@ -316,17 +311,17 @@ function TrainingsComponent() {
 
                     <FormGroup>
                         <label>Id:</label>
-                        <input className="form-control" name="id" type="text" readOnly value={state.form?.id || ''} />
+                        <input className="form-control" name="id" type="text" readOnly value={formState.form?.id || ''} />
                     </FormGroup>
 
                     <FormGroup>
                         <label>Fecha:</label>
-                        <input className="form-control" name="fecha" type="text" onChange={ handleChangeEdit } value={state.form?.fecha || ''} />
+                        <input className="form-control" name="fecha" type="text" onChange={ handleChangeEdit } value={formState.form?.fecha || ''} />
                     </FormGroup>
 
                     <FormGroup>
                         <label>Hora:</label>
-                        <input className="form-control" name="hora" type="text" onChange={ handleChangeEdit } value={state.form?.hora || ''} />
+                        <input className="form-control" name="hora" type="text" onChange={ handleChangeEdit } value={formState.form?.hora || ''} />
                     </FormGroup>
 
                     <FormGroup>
@@ -339,26 +334,28 @@ function TrainingsComponent() {
                     }
 
                     <FormGroup>
-                        <label>Vídeos:</label>                       
-                        {/* <input className="form-control" name="video" type="text" onChange={ handleAddingVideo } />
-                        <Button color="primary" onClick={ handleAddVideo }>Añadir vídeo</Button> */}
+                        <label>Vídeos:</label>
+                        <TagsInput
+                            value={formState.form?.videos}
+                            onChange={ handleChangeVideos }
+                            placeholder="Vídeos..."
+                        />
                     </FormGroup>
-
-                    {
-                            videosAdd.map(( video ) => <div className="d-inline-block ms-1 mt-1" key={video}><Badge bg="secondary">{video}</Badge></div> )
-                    }
 
                 </ModalBody>
 
                 <ModalFooter>
-                    <Button color="primary" onClick={ () => handleEditTraining(state.form) }>Actualizar</Button>
+                    <Button color="primary" onClick={ () => handleEditTraining(formState.form) }>Actualizar</Button>
                     <Button color="danger" onClick={ ocultarModalEditar }>Cancelar</Button>  
                 </ModalFooter>
 
-                <div className="p-3">
-                    <h3>Vídeo de la sesión</h3>
-                    <YoutubeEmbed embedId="lWpBj66L7Z8" />
-                </div>
+                {/* <div className="p-3">
+                    <h3>Vídeos de la sesión</h3>
+                    {videosAdd.map((video) => {
+                        <YoutubeEmbed embedId={video} />
+                    })}
+                    
+                </div> */}
             </Modal>
 
             

@@ -6,6 +6,14 @@ import { NavDropdown } from "react-bootstrap";
 import { startLogout } from '../actions/auth';
 import escudo from '../assets/images/escudo-transparente.png'
 
+import { firebase, googleAuthProvider } from '../firebase/firebase-config';
+
+const user = firebase.auth().currentUser;
+if ( user ) {
+    console.log(user.email)
+} else {
+    console.log('No autenticado')
+}
 
 export const Navbar = () => {
 
@@ -102,7 +110,8 @@ export const Navbar = () => {
             </div>
 
             <div className="navbar-collapse collapse w-100 order-3 dual-collapse2">
-                <ul className="navbar-nav ml-auto">
+                <ul className="navbar-nav ms-auto">
+                    <h6 className="text-light mt-2">{user?.email || ''}</h6>
                     <NavLink 
                         activeClassName="active"
                         className="nav-item nav-link"
