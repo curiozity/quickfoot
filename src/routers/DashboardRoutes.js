@@ -8,6 +8,7 @@ import MatchesComponents from '../components/MatchesComponent';
 import TeamsComponents from '../components/TeamsComponent';
 import TasksComponents from '../components/TasksComponent';
 import { Navbar } from '../ui/NavBar';
+import MatchAnalysisComponent from '../components/MatchAnalysisComponent';
 
 
 
@@ -24,6 +25,7 @@ function DashboardRoutes() {
                     <Route exact path="/matches" component={ MatchesComponents } />
                     <Route exact path="/teams" component={ TeamsComponents } />
                     <Route exact path="/tasks" component={ TasksComponents } />
+                    <Route exact path="/matchanalysis" component={ MatchAnalysisComponent } />
 
                     <Redirect to="/players" />
                 </Switch>

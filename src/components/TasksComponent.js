@@ -377,20 +377,18 @@ function TasksComponent() {
             <Modal isOpen={state.modalInsertar} size="lg" style={{maxWidth: '900px', width: '100%'}}>
                 <ModalHeader>
                  <div className="row">
-                            <div className="col-2"><img src={ tacticIcon } width="64" alt="Partido" /></div>
-                            <div className="col-10">
-                                <div className="row"
-                                    ><h2>Añadir nueva tarea</h2>
+                        <div className="col-2"><img src={ tacticIcon } width="64" alt="Partido" /></div>
+                        <div className="col-10">
+                            <div className="row"
+                                ><h2>Añadir nueva tarea</h2>
+                            </div>
+                            <div className="row">
+                                <div>
+                                    <h6><Badge bg="danger">Badge</Badge></h6>
                                 </div>
-                                <div className="row">
-                                    <div>
-                                        <h6><Badge bg="danger">Badge</Badge></h6>
-                                        
-                                    </div>
-                                </div>
-                                
                             </div>
                         </div>
+                    </div>
                 </ModalHeader>
 
                 <ModalBody>

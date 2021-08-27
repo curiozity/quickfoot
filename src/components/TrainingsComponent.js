@@ -27,7 +27,7 @@ function TrainingsComponent() {
             const loadPlayer = {
                 id: doc.id,
                 apodo: doc.data().apodo,
-                entrena: false,
+                entrena: true,
             }
 
             setPlayers(players => [...players, loadPlayer]);

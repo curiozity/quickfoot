@@ -82,16 +82,29 @@ export const Navbar = () => {
                                 Tareas
                             </NavLink>
                         </NavDropdown.Item>
-                    </NavDropdown>  
+                    </NavDropdown>
 
                     <NavLink 
-                        activeClassName="active"
-                        className="nav-item nav-link" 
-                        exact
-                        to="/matches"
-                    >
-                        Partidos
+                            activeClassName="active"
+                            className="nav-item nav-link" 
+                            exact
+                            to="/matches"
+                        >
+                            Partidos
                     </NavLink>
+
+                    <NavDropdown title="Análisis" id="nav-dropdown">
+                        <NavDropdown.Item className="bg-dark">
+                            <NavLink 
+                                activeClassName="active"
+                                className="nav-item nav-link" 
+                                exact
+                                to="/matchanalysis"
+                            >
+                                Partidos
+                            </NavLink>
+                        </NavDropdown.Item>
+                    </NavDropdown>
 
                     <NavDropdown title="Datos" id="nav-dropdown">
                         <NavDropdown.Item className="bg-dark">
